@@ -18,9 +18,10 @@ const normalizeEmail = (email) => (email || '').trim().toLowerCase();
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
+  sameSite: 'none', // ✅ required for cross-site cookies
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
+
 
 // Generate token
 const generateAccessToken = (userId) =>
@@ -318,11 +319,8 @@ exports.refreshToken = async (req, res) => {
 
 // ---- Logout ----
 exports.logoutUser = (req, res) => {
-  res.clearCookie('jwt', {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-  });
+  res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'none' });
+
   return res.json({ message: 'Logged out' });
 };
 
@@ -330,11 +328,8 @@ exports.logoutUser = (req, res) => {
 exports.deleteAccount = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.user.id);
-    res.clearCookie('jwt', {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    });
+    res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'none' });
+
     return res.json({ message: 'Account deleted' });
   } catch (error) {
     return res.status(500).json({ message: error.message });

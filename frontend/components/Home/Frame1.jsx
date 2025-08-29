@@ -233,116 +233,253 @@ const Frame1 = () => {
       </div>
 
       {/* Login Modal */}
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative">
-            <button onClick={closeLoginModal} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
-            <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Login</h2>
+{showLoginModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative">
+      <button
+        onClick={closeLoginModal}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+      >
+        ×
+      </button>
+      <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Login</h2>
 
-            {!needOtp ? (
-              <form onSubmit={handleLogin} className="space-y-6">
-                {loginError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{loginError}</div>}
+      {!needOtp ? (
+        <form onSubmit={handleLogin} className="space-y-6">
+          {loginError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {loginError}
+            </div>
+          )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input type="email" name="email" value={loginForm.email} onChange={handleLoginChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter your email" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input type="password" name="password" value={loginForm.password} onChange={handleLoginChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter your password" />
-                </div>
-
-                <button type="submit" disabled={loginLoading} className="w-full bg-black text-white py-3 rounded-lg font-semibold disabled:opacity-50">{loginLoading ? 'Logging in...' : 'Login'}</button>
-              </form>
-            ) : (
-              <form onSubmit={submitOtp} className="space-y-6">
-                <button
-                  type="button"
-                  onClick={() => setNeedOtp(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                >
-                  ←
-                </button>
-                <div className="text-sm text-gray-600">Enter the OTP sent to your email.</div>
-                {otpError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{otpError}</div>}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">OTP</label>
-                  <input value={otp} onChange={e => setOtp(e.target.value)} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123456" />
-                </div>
-                <button type="submit" disabled={otpLoading} className="w-full bg-black text-white py-3 rounded-lg font-semibold">{otpLoading ? 'Verifying...' : 'Verify'}</button>
-                <button type="button" onClick={async () => {
-                  setOtpError('');
-                  await api.post('/auth/request-email-otp', { email: pendingEmail });
-                }} className="mt-2 underline">Resend OTP</button>
-              </form>
-            )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={loginForm.email}
+              onChange={handleLoginChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="Enter your email"
+            />
           </div>
-        </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={loginForm.password}
+              onChange={handleLoginChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loginLoading}
+            className="w-full bg-black text-white py-3 rounded-lg font-semibold disabled:opacity-50"
+          >
+            {loginLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={submitOtp} className="space-y-6">
+          <button
+            type="button"
+            onClick={() => setNeedOtp(false)}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+          >
+            ← Back
+          </button>
+          <div className="text-sm text-gray-600">Enter the OTP sent to your email.</div>
+
+          {otpError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {otpError}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">OTP</label>
+            <input
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="123456"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={otpLoading}
+            className="w-full bg-black text-white py-3 rounded-lg font-semibold"
+          >
+            {otpLoading ? 'Verifying...' : 'Verify'}
+          </button>
+
+          <button
+            type="button"
+            onClick={async () => {
+              setOtpError('');
+              await api.post('/auth/request-email-otp', { email: pendingEmail });
+            }}
+            className="mt-2 underline"
+          >
+            Resend OTP
+          </button>
+        </form>
       )}
+    </div>
+  </div>
+)}
+
 
       {/* Register Modal */}
-      {showRegisterModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative">
-            <button onClick={closeRegisterModal} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
-            <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Register</h2>
+{showRegisterModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative">
+      <button
+        onClick={closeRegisterModal}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold"
+      >
+        ×
+      </button>
+      <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Register</h2>
 
-            {!registerNeedOtp ? (
-              <form onSubmit={handleRegister} className="space-y-6">
-                {registerError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{registerError}</div>}
+      {!registerNeedOtp ? (
+        <form onSubmit={handleRegister} className="space-y-6">
+          {registerError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {registerError}
+            </div>
+          )}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-                  <input type="text" name="username" value={registerForm.username} onChange={handleRegisterChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter your username" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input type="email" name="email" value={registerForm.email} onChange={handleRegisterChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter your email" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input type="password" name="password" value={registerForm.password} onChange={handleRegisterChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Enter your password" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                  <input type="password" name="confirmPassword" value={registerForm.confirmPassword} onChange={handleRegisterChange} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="Confirm your password" />
-                </div>
-
-                <button type="submit" disabled={registerLoading} className="w-full bg-black text-white py-3 rounded-lg font-semibold">{registerLoading ? 'Sending OTP...' : 'Register'}</button>
-              </form>
-            ) : (
-              <form onSubmit={submitRegisterOtp} className="space-y-6">
-                <button
-                  type="button"
-                  onClick={() => setRegisterNeedOtp(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                >
-                  ←
-                </button>
-                <div className="text-sm text-gray-600">Enter the OTP sent to your email.</div>
-                {registerOtpError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{registerOtpError}</div>}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">OTP</label>
-                  <input value={registerOtp} onChange={e => setRegisterOtp(e.target.value)} required className="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="123456" />
-                </div>
-                <button type="submit" disabled={registerOtpLoading} className="w-full bg-black text-white py-3 rounded-lg font-semibold">{registerOtpLoading ? 'Verifying...' : 'Verify'}</button>
-                <button type="button" onClick={async () => {
-                  setRegisterOtpError('');
-                  await api.post('/auth/request-register-otp', {
-                    username: registerForm.username,
-                    email: registerForm.email,
-                    password: registerForm.password,
-                  });
-                }} className="mt-2 underline">Resend OTP</button>
-              </form>
-            )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+            <input
+              type="text"
+              name="username"
+              value={registerForm.username}
+              onChange={handleRegisterChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="Enter your username"
+            />
           </div>
-        </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={registerForm.email}
+              onChange={handleRegisterChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="Enter your email"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={registerForm.password}
+              onChange={handleRegisterChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="Enter your password"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={registerForm.confirmPassword}
+              onChange={handleRegisterChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="Confirm your password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={registerLoading}
+            className="w-full bg-black text-white py-3 rounded-lg font-semibold disabled:opacity-50"
+          >
+            {registerLoading ? 'Sending OTP...' : 'Register'}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={submitRegisterOtp} className="space-y-6">
+          <button
+            type="button"
+            onClick={() => {
+              setRegisterNeedOtp(false);
+              setRegisterOtp('');
+              setRegisterOtpError('');
+            }}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+          >
+            ← Back
+          </button>
+
+          <div className="text-sm text-gray-600">Enter the OTP sent to your email.</div>
+
+          {registerOtpError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {registerOtpError}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">OTP</label>
+            <input
+              value={registerOtp}
+              onChange={e => setRegisterOtp(e.target.value)}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              placeholder="123456"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={registerOtpLoading}
+            className="w-full bg-black text-white py-3 rounded-lg font-semibold"
+          >
+            {registerOtpLoading ? 'Verifying...' : 'Verify'}
+          </button>
+
+          <button
+            type="button"
+            onClick={async () => {
+              setRegisterOtpError('');
+              await api.post('/auth/request-register-otp', {
+                username: registerForm.username,
+                email: registerEmail,
+                password: registerForm.password,
+              });
+            }}
+            className="mt-2 underline"
+          >
+            Resend OTP
+          </button>
+        </form>
       )}
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

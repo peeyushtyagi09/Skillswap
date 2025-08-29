@@ -32,7 +32,7 @@ const corsOptions = {
       'http://localhost:5173',
       'http://localhost:3000',
       'https://skillswap.vercel.app',
-      'https://skillswap-tk88.onrender.com'
+      'https://skillswap-hxun.vercel.app'
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -90,13 +90,12 @@ app.use('/api/friend', friendRoutes);
 app.use('/api/call-rating', callRatingRoutes);
 app.use('/api', newRoutes);
 
+
+
 // Socket.IO setup with CORS matching frontend
 const { Server } = require('socket.io');
 const io = new Server(server, {
-  cors: {
-    origin: "https://skillswap.vercel.app",
-    credentials: true,
-  },
+  cors: { origin: "https://skillswap-hxun.vercel.app", credentials: true }
 });
 app.set('io', io);
 
