@@ -2,9 +2,9 @@
 require('dotenv').config();
 
 const config = {
-    NODE_ENV: process.env.NODE_ENV || 'development',
-    PORT: parseInt(process.env.PORT || '8000', 10),
-    CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+    NODE_ENV: process.env.NODE_ENV,
+    PORT: parseInt(process.env.PORT, 10),
+    CLIENT_URL: process.env.CLIENT_URL,
     MONGODB_URI: process.env.MONGODB_URI,
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET,
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
