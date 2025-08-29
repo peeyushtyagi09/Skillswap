@@ -139,7 +139,7 @@ export default function CallInviteModal({
         </div>
 
         {/* Replace with your ringtone asset path */}
-        <audio ref={audioRef} src="src/public/sound/callSound.mp4" loop preload="auto" />
+        <audio ref={audioRef} src="/sound/callSound.mp4" loop preload="auto" />
       </div>
     </div>
   );

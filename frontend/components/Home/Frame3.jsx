@@ -29,25 +29,25 @@ const Frame3 = () => {
     {
       text: "Swap skills, unlock new opportunities",
       images: [
-        "/src/public/images/image1.png",
-        "/src/public/images/image2.png",
-        "/src/public/images/image3.png",
+        "/images/image1.png",
+        "/images/image2.png",
+        "/images/image3.png",
       ],
     },
     {
       text: "Learn fast through real connections",
       images: [
-        "/src/public/images/image4.png",
-        "/src/public/images/image5.png",
-        "/src/public/images/image1.png",
+        "/images/image4.png",
+        "/images/image5.png",
+        "/images/image1.png",
       ],
     },
     {
       text: "Grow together, teach and inspire",
       images: [
-        "/src/public/images/image1.png",
-        "/src/public/images/image3.png",
-        "/src/public/images/image5.png",
+        "/images/image1.png",
+        "/images/image3.png",
+        "/images/image5.png",
       ],
     },
   ];

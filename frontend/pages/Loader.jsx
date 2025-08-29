@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const images = [
-  "src/public/images/LoaderImage1.png",
-  "src/public/images/LoaderImage2.jpg",
-  "src/public/images/LoaderImage3.png",
-  "src/public/images/LoaderImage4.png",
-  "src/public/images/LoaderImage5.png",
-  "src/public/images/LoaderImage6.png",
+  "images/LoaderImage1.png",
+  "images/LoaderImage2.jpg",
+  "images/LoaderImage3.png",
+  "images/LoaderImage4.png",
+  "images/LoaderImage5.png",
+  "images/LoaderImage6.png",
 ];
 
 export default function Loader({ onFinish }) {

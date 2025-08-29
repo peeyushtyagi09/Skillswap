@@ -190,7 +190,7 @@ const Frame1 = () => {
 
       <div className="flex flex-1 items-center justify-center">
         <div className="relative flex flex-col items-center">
-          <img className="animated-image" src="/src/public/images/frame1_main.png" alt="" />
+          <img className="animated-image" src="/images/frame1_main.png" alt="" />
           <style>{`
             @keyframes floatAround {
               0%   { transform: translate(0, 0); }

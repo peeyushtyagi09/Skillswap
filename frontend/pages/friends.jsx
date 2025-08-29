@@ -154,7 +154,7 @@ const Friends = () => {
   return (
     <div  className="w-full h-screen overflow-hidden "
     style={{
-      backgroundImage: "url('/src/public/images/friend.png')", // put your file in /public/images
+      backgroundImage: "url('/images/friend.png')", // put your file in /public/images
       backgroundRepeat: "repeat-y", // repeat vertically if height increases
       backgroundSize: "100% auto", // stretch full width, keep ratio
     }}

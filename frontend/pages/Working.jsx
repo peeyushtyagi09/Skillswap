@@ -17,7 +17,7 @@ const Working = () => {
     <div className="relative w-full h-screen">
       {/* Full width image from public folder */}
       <img
-        src="/src/public/images/working.png" // put your image inside /public
+        src="/images/working.png" // put your image inside /public
         alt="Coming soon"
         className="w-full h-full object-cover"
       />
