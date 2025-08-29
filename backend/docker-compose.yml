@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    command: npm run dev
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/skillswap
+      - CLIENT_URL=http://localhost:5173
+      - ACCESS_TOKEN_SECRET=dev_access_secret
+      - REFRESH_TOKEN_SECRET=dev_refresh_secret
+      - ICE_STUN_URLS=stun:stun.l.google.com:19302
+      - ICE_TURN_URLS=turn:coturn:3478
+      - TURN_USER=turnuser
+      - TURN_PASSWORD=turnpass
+    depends_on:
+      - mongo
+      - coturn
+  mongo:
+    image: mongo:7
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  coturn:
+    image: instrumentisto/coturn
+    restart: always
+    command: [
+      "-n", "--log-file=stdout", "--min-port=49160", "--max-port=49200",
+      "--no-cli", "--no-tcp", "--realm=skillswap.local",
+      "--user=turnuser:turnpass"
+    ]
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+volumes:
+  mongo_data:
