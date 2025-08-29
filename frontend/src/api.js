@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://skillswap-tk88.onrender.com/api', // 👈 use your deployed backend URL
+  baseURL: import.meta.env.VITE_API_URL + '/api',
   headers: { 'Content-Type': 'application/json' },
-  withCredentials: true, // For cookies (refresh token)
+  withCredentials: true,
 });
 
 export default api;
