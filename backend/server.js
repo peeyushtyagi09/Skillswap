@@ -26,10 +26,15 @@ connectDB();
 // Clean CORS configuration with explicit origin handling
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000'];
+
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://skillswap.vercel.app',
+      'https://skillswap-tk88.onrender.com'
+    ];
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -47,6 +52,7 @@ const corsOptions = {
   ],
   exposedHeaders: ['Set-Cookie'],
 };
+
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
@@ -88,7 +94,7 @@ app.use('/api', newRoutes);
 const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    origin: "https://skillswap.vercel.app",
     credentials: true,
   },
 });

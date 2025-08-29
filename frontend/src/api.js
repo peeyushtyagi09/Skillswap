@@ -1,8 +1,7 @@
-// src/api.js
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // Adjust if your server uses a different base URL
+  baseURL: 'https://skillswap-tk88.onrender.com/api', // 👈 use your deployed backend URL
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true, // For cookies (refresh token)
 });
