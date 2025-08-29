@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useNavigate } from 'react-router-dom';
 import api from '../../src/api';
+console.log(api.defaults.baseURL);
 
 gsap.registerPlugin(ScrollTrigger);
 
