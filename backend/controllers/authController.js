@@ -177,11 +177,11 @@ exports.loginUser = async (req, res) => {
 
     // 1. Find user
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'Invalid email or password' });
+    if (!user) return res.status(401).json({ message: 'bhai user nahi mil raha ' });
 
     // 2. Check password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
+    if (!isMatch) return res.status(401).json({ message: 'bhai password wrong ha ' });
 
     // 3. Create tokens
     const accessToken = jwt.sign(
