@@ -31,8 +31,7 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:3000',
-      'https://skillswap.vercel.app',
-      'https://skillswap-hxun.vercel.app'
+      process.env.CLIENT_URL, // Use env variable
     ];
 
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -95,7 +94,10 @@ app.use('/api', newRoutes);
 // Socket.IO setup with CORS matching frontend
 const { Server } = require('socket.io');
 const io = new Server(server, {
-  cors: { origin: "https://skillswap-hxun.vercel.app", credentials: true }
+  cors: {
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  },
 });
 app.set('io', io);
 

@@ -10,7 +10,7 @@ const MAX_OTP_ATTEMPTS = 5;
 const OTP_LOCKOUT_MINUTES = 10;
 const MAX_PASSWORD_ATTEMPTS = 10;
 const PASSWORD_LOCKOUT_MINUTES = 15;
-const EMAIL_OTP_RESEND_SECONDS = 60; // throttle email OTP send
+const EMAIL_OTP_RESEND_SECONDS = 90; // throttle email OTP send
 
 // ---- Helpers ----
 const normalizeEmail = (email) => (email || '').trim().toLowerCase();
@@ -62,7 +62,7 @@ exports.registerUser = async (req, res) => {
   return res.status(410).json({ message: 'Use /request-register-otp and /verify-register-otp instead' });
 };
 
-// ---- Request Register OTP ----
+// ---- Request Register OTP ---- 
 exports.requestRegisterOtp = async (req, res) => {
   let { username, email, password } = req.body;
   try {
@@ -82,26 +82,30 @@ exports.requestRegisterOtp = async (req, res) => {
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
     // Clean up any old temp for this email
-    await TempRegistration.deleteOne({ email });
+    let temp = await TempRegistration.findOne({ email });
+
+    const now = Date.now();
+    if (temp && temp.otpLastSentAt && now - temp.otpLastSentAt.getTime() < EMAIL_OTP_RESEND_SECONDS * 1000) {
+      const wait = Math.ceil((EMAIL_OTP_RESEND_SECONDS * 1000 - (now - temp.otpLastSentAt.getTime())) / 1000);
+      return res.status(429).json({ message: `Please wait ${wait}s before requesting another OTP` });
+    }
+
+    if (!temp) temp = new TempRegistration({ email });
 
     // Hash password and encrypt data
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const data = JSON.stringify({ username, hashedPassword });
-    const encryptedData = encrypt(data);
+    temp.encryptedData = encrypt(data);
 
     // Generate and hash OTP
     const otp = String(Math.floor(100000 + Math.random() * 900000)); // 6-digit
-    const otpHash = await hashString(otp);
-    const now = Date.now();
+    temp.otpHash = await hashString(otp);
+    temp.otpExpiry = new Date(now + 5 * 60 * 1000); // 5 min expiry
+    temp.otpLastSentAt = new Date(now);
+    temp.otpAttempts = 0;
+    temp.otpLockedUntil = undefined;
 
-    const temp = new TempRegistration({
-      email,
-      encryptedData,
-      otpHash,
-      otpExpiry: new Date(now + 5 * 60 * 1000),
-      otpLastSentAt: new Date(now),
-    });
     await temp.save();
 
     await sendEmail(email, `${process.env.APP_NAME} Registration OTP`, `Your OTP is ${otp}. It expires in 5 minutes.`);
@@ -111,6 +115,7 @@ exports.requestRegisterOtp = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 // ---- Verify Register OTP ----
 exports.verifyRegisterOtp = async (req, res) => {
@@ -149,7 +154,7 @@ exports.verifyRegisterOtp = async (req, res) => {
     const user = new User({
       Username: decryptedData.username,
       email,
-      password: decryptedData.hashedPassword,
+      password: decryptedData.hashedPassword, // pre-hashed password
     });
     await user.save();
     await TempRegistration.deleteOne({ _id: temp._id });
@@ -203,6 +208,7 @@ exports.loginUser = async (req, res) => {
     // Always require email OTP
     return res.json({ id: user._id, email: user.email, need2fa: true, method: 'email' });
   } catch (error) {
+    console.error('Login Error:', error);
     return res.status(500).json({ message: error.message });
   }
 };
