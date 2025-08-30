@@ -161,7 +161,8 @@ exports.verifyRegisterOtp = async (req, res) => {
 
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
-    res.cookie('jwt', refreshToken, cookieOptions);
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+
 
     return res.status(201).json(buildAuthResponse(user, accessToken));
   } catch (error) {
@@ -169,47 +170,45 @@ exports.verifyRegisterOtp = async (req, res) => {
   }
 };
 
-// ---- Login (password step) ----
+// --- LOGIN ---
 exports.loginUser = async (req, res) => {
-  let { email, password } = req.body;
-
   try {
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-    }
+    const { email, password } = req.body;
 
-    email = normalizeEmail(email);
+    // 1. Find user
     const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: 'Invalid email or password' });
 
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+    // 2. Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
 
-    if (user.passwordLockedUntil && user.passwordLockedUntil > Date.now()) {
-      return res.status(429).json({ message: 'Too many attempts. Please try again later.' });
-    }
+    // 3. Create tokens
+    const accessToken = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: '15m' } // short lived
+    );
 
-    const validPassword = await user.matchPassword(password);
-    if (!validPassword) {
-      user.passwordAttempts = (user.passwordAttempts || 0) + 1;
-      if (user.passwordAttempts >= MAX_PASSWORD_ATTEMPTS) {
-        user.passwordLockedUntil = new Date(Date.now() + PASSWORD_LOCKOUT_MINUTES * 60 * 1000);
-        user.passwordAttempts = 0;
-      }
-      await user.save();
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+    const refreshToken = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: '7d' } // long lived
+    );
 
-    // Reset password attempts
-    user.passwordAttempts = 0;
-    user.passwordLockedUntil = undefined;
-    await user.save();
+    // 4. Store refresh token in cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // only send over HTTPS in prod
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
-    // Always require email OTP
-    return res.json({ id: user._id, email: user.email, need2fa: true, method: 'email' });
-  } catch (error) {
-    console.error('Login Error:', error);
-    return res.status(500).json({ message: error.message });
+    // 5. Send accessToken to client
+    return res.json({ accessToken });
+  } catch (err) {
+    console.error('Login error:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -292,7 +291,8 @@ exports.verifyEmailOtp = async (req, res) => {
 
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
-    res.cookie('jwt', refreshToken, cookieOptions);
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+
 
     return res.json(buildAuthResponse(user, accessToken));
   } catch (err) {
@@ -303,7 +303,7 @@ exports.verifyEmailOtp = async (req, res) => {
 // ---- Refresh access token from refresh cookie ----
 exports.refreshToken = async (req, res) => {
   try {
-    const token = req.cookies?.jwt;
+    const token = req.cookies?.refreshToken;
     if (!token) return res.status(401).json({ message: 'No refresh token' });
 
     let decoded;
@@ -325,8 +325,7 @@ exports.refreshToken = async (req, res) => {
 
 // ---- Logout ----
 exports.logoutUser = (req, res) => {
-  res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'none' });
-
+  res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'none' });
   return res.json({ message: 'Logged out' });
 };
 
@@ -334,8 +333,7 @@ exports.logoutUser = (req, res) => {
 exports.deleteAccount = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.user.id);
-    res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'none' });
-
+    res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'none' });
     return res.json({ message: 'Account deleted' });
   } catch (error) {
     return res.status(500).json({ message: error.message });

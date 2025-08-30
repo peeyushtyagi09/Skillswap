@@ -15,6 +15,7 @@ const UploadRoutes = require('./upload/upload');
 const friendRoutes = require('./routes/friendRoutes');
 const callRatingRoutes = require('./routes/callRatingRoutes');
 const userProfileRoutes = require('./routes/userProfileRoutes');
+const tokenRoutes = require('./routes/tokenRoutes');
 
 // Initialize express and HTTP server to attach Socket.IO
 const app = express();
@@ -69,7 +70,7 @@ app.use(helmet({
 }));
 app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
-
+app.use('/api/auth', tokenRoutes);
 // Basic rate LIMITS for API
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,

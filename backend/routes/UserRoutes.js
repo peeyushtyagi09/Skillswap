@@ -16,19 +16,22 @@ const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
+
+   
+
 // Registration with OTP
-router.post("/request-register-otp", protect, requestRegisterOtp);
-router.post("/verify-register-otp", protect, verifyRegisterOtp);
+router.post("/request-register-otp",  requestRegisterOtp);
+router.post("/verify-register-otp",  verifyRegisterOtp);
 
 // Original register (disabled or kept for legacy)
-router.post("/register", protect, registerUser);
-router.post("/login", protect, loginUser);
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
 // Email OTP for login
-router.post("/request-email-otp", protect, requestEmailOtp);
-router.post("/verify-email-otp", protect, verifyEmailOtp);
+router.post("/request-email-otp", requestEmailOtp);
+router.post("/verify-email-otp", verifyEmailOtp);
 
-router.post("/refresh", protect, refreshToken);
+router.get("/refresh",  refreshToken);
 router.post("/logout", protect, logoutUser);
 router.delete("/delete", protect, deleteAccount);
 router.get("/me", protect, getMe);

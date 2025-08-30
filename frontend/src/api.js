@@ -57,7 +57,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await api.get('/auth/refresh-token'); // uses HTTP-only cookie
+        const { data } = await api.get('/auth/refresh'); // uses HTTP-only cookie
         accessToken = data.accessToken;
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         processQueue(null, accessToken);

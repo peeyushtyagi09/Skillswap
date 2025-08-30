@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../src/api';
+import { setAccessToken } from '../../src/api';
 
 const SKILLWAP_LETTERS = ['S', 'K', 'I', 'L', 'L', 'S', 'W', 'A', 'P'];
 
@@ -66,6 +67,7 @@ const Frame1 = () => {
         }
         return;
       }
+      setAccessToken(data.accessToken);
       localStorage.setItem('accessToken', data.accessToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
       navigate('/landing');
@@ -87,6 +89,7 @@ const Frame1 = () => {
         : { email: pendingEmail, token: otp }; // TOTP
       const endpoint = twoFAMethod === 'email' ? '/auth/verify-email-otp' : '/auth/verify-totp-login';
       const { data } = await api.post(endpoint, payload);
+      setAccessToken(data.accessToken); 
       localStorage.setItem('accessToken', data.accessToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
       navigate('/landing');
@@ -131,6 +134,7 @@ const Frame1 = () => {
     try {
       const { data } = await api.post('/auth/verify-register-otp', { email: registerEmail, otp: registerOtp });
       localStorage.setItem('accessToken', data.accessToken);
+      setAccessToken(data.accessToken); 
       api.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
       navigate('/landing');
     } catch (err) {
