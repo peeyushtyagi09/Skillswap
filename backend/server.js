@@ -31,12 +31,14 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:3000',
-      process.env.CLIENT_URL, // Use env variable
+      process.env.CLIENT_URL?.replace(/\/$/, ''), // remove trailing /
     ];
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // normalize origin by removing trailing slash
+    if (allowedOrigins.includes(origin.replace(/\/$/, ''))) {
       callback(null, true);
     } else {
+      console.error("❌ CORS blocked origin:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -79,6 +81,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+console.log("✅ Allowed client:", process.env.CLIENT_URL);
+
 
 // Routes
 app.use('/api/auth', UserRoutes);
