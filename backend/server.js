@@ -26,19 +26,25 @@ connectDB();
 // Clean CORS configuration with explicit origin handling
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true); // allow requests like Postman
 
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:3000',
-      process.env.CLIENT_URL?.replace(/\/$/, ''), // remove trailing /
+      process.env.CLIENT_URL, // main production frontend
     ];
 
-    // normalize origin by removing trailing slash
-    if (allowedOrigins.includes(origin.replace(/\/$/, ''))) {
+    // ✅ Allow all vercel preview URLs
+    const vercelPreviewRegex = /^https:\/\/skillswap-hxun-.*\.vercel\.app$/;
+
+    if (
+      allowedOrigins.includes(origin) ||
+      vercelPreviewRegex.test(origin)
+    ) {
+      console.log('✅ Allowed client:', origin);
       callback(null, true);
     } else {
-      console.error("❌ CORS blocked origin:", origin);
+      console.log('❌ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -53,7 +59,6 @@ const corsOptions = {
   ],
   exposedHeaders: ['Set-Cookie'],
 };
-
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
@@ -72,6 +77,13 @@ const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+
+// Example route
+app.get('/', (req, res) => {
+  res.send('✅ Backend is running...');
+});
+
 app.use('/api', apiLimiter);
 
 // Static files (uploads)
