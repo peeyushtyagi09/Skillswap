@@ -38,6 +38,9 @@ const transporter = nodemailer.createTransport({
   auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
 });
 
+
+
+
 const sendEmail = async (to, subject, text) => {
   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, text });
 };
@@ -60,6 +63,112 @@ const buildAuthResponse = (user, accessToken, extra = {}) => ({
 // ---- Register (disabled; use OTP flow) ----
 exports.registerUser = async (req, res) => {
   return res.status(410).json({ message: 'Use /request-register-otp and /verify-register-otp instead' });
+};
+
+
+// helper: send login OTP with throttle + lockout using User fields
+const sendLoginOtp = async (user) => {
+  const now = Date.now();
+
+  // lockout window
+  if (user.otpLockedUntil && user.otpLockedUntil > now) {
+    const ms = user.otpLockedUntil - now;
+    const mins = Math.ceil(ms / 60000);
+    const err = new Error(`Too many attempts. Try again in ~${mins}m`);
+    err.status = 429;
+    throw err;
+  }
+
+  // throttle resend
+  if (user.otpLastSentAt && now - user.otpLastSentAt.getTime() < EMAIL_OTP_RESEND_SECONDS * 1000) {
+    const wait = Math.ceil((EMAIL_OTP_RESEND_SECONDS * 1000 - (now - user.otpLastSentAt.getTime())) / 1000);
+    const err = new Error(`Please wait ${wait}s before requesting another OTP`);
+    err.status = 429;
+    throw err;
+  }
+
+  const otp = String(Math.floor(100000 + Math.random() * 900000)); // 6-digit
+  user.otpHash = await hashString(otp);
+  user.otpExpiry = new Date(now + 5 * 60 * 1000); // 5 minutes
+  user.otpAttempts = 0;
+  user.otpLockedUntil = undefined;
+  user.otpLastSentAt = new Date(now);
+  await user.save();
+
+  await sendEmail(user.email, `${process.env.APP_NAME} Login OTP`, `Your OTP is ${otp}. It expires in 5 minutes.`);
+};
+// optional endpoint to explicitly request login OTP (reuses helper)
+exports.requestEmailOtp = async (req, res) => {
+  try {
+    let { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+    email = normalizeEmail(email);
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    await sendLoginOtp(user);
+    return res.json({ message: 'OTP sent' });
+  } catch (err) {
+    const status = err.status || 500;
+    return res.status(status).json({ message: err.message || 'Server error' });
+  }
+};
+// --- VERIFY EMAIL OTP (Step 2: issues tokens on success) ---
+exports.verifyEmailOtp = async (req, res) => {
+  try {
+    let { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: 'Email and OTP are required' });
+    email = normalizeEmail(email);
+
+    const user = await User.findOne({ email });
+    if (!user || !user.otpHash || !user.otpExpiry) {
+      return res.status(400).json({ message: 'No OTP requested' });
+    }
+
+    // lockout check
+    if (user.otpLockedUntil && user.otpLockedUntil > Date.now()) {
+      return res.status(429).json({ message: 'Too many attempts. Please try again later.' });
+    }
+
+    // expiry check
+    if (Date.now() > user.otpExpiry.getTime()) {
+      user.otpHash = undefined;
+      user.otpExpiry = undefined;
+      await user.save();
+      return res.status(400).json({ message: 'OTP expired' });
+    }
+
+    // verify
+    const ok = await verifyHash(otp, user.otpHash);
+    if (!ok) {
+      user.otpAttempts = (user.otpAttempts || 0) + 1;
+      if (user.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        user.otpLockedUntil = new Date(Date.now() + OTP_LOCKOUT_MINUTES * 60 * 1000);
+        user.otpAttempts = 0;
+      }
+      await user.save();
+      return res.status(401).json({ message: 'Invalid OTP' });
+    }
+
+    // success -> clear otp fields
+    user.otpHash = undefined;
+    user.otpExpiry = undefined;
+    user.otpAttempts = 0;
+    user.otpLockedUntil = undefined;
+    await user.save();
+
+    // tokens
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // one cookie name everywhere; reuse your cookieOptions
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+
+    return res.json(buildAuthResponse(user, accessToken));
+  } catch (err) {
+    return res.status(500).json({ message: err.message || 'Server error' });
+  }
 };
 
 // ---- Request Register OTP ---- 
@@ -117,98 +226,81 @@ exports.requestRegisterOtp = async (req, res) => {
 };
 
 
-// ---- Verify Register OTP ----
-exports.verifyRegisterOtp = async (req, res) => {
-  let { email, otp } = req.body;
+// VERIFY EMAIL OTP: (unchanged mostly) issues tokens on success
+exports.verifyEmailOtp = async (req, res) => {
   try {
+    let { email, otp } = req.body;
     if (!email || !otp) return res.status(400).json({ message: 'Email and OTP are required' });
     email = normalizeEmail(email);
 
-    const temp = await TempRegistration.findOne({ email });
-    if (!temp || !temp.otpHash || !temp.otpExpiry) {
-      return res.status(400).json({ message: 'No registration in progress' });
+    const user = await User.findOne({ email });
+    if (!user || !user.otpHash || !user.otpExpiry) {
+      return res.status(400).json({ message: 'No OTP requested' });
     }
 
-    if (temp.otpLockedUntil && temp.otpLockedUntil > Date.now()) {
+    if (user.otpLockedUntil && user.otpLockedUntil > Date.now()) {
       return res.status(429).json({ message: 'Too many attempts. Please try again later.' });
     }
 
-    if (Date.now() > temp.otpExpiry.getTime()) {
-      await TempRegistration.deleteOne({ _id: temp._id });
+    if (Date.now() > user.otpExpiry.getTime()) {
+      user.otpHash = undefined;
+      user.otpExpiry = undefined;
+      await user.save();
       return res.status(400).json({ message: 'OTP expired' });
     }
 
-    const ok = await verifyHash(otp, temp.otpHash);
+    const ok = await verifyHash(otp, user.otpHash);
     if (!ok) {
-      temp.otpAttempts += 1;
-      if (temp.otpAttempts >= MAX_OTP_ATTEMPTS) {
-        temp.otpLockedUntil = new Date(Date.now() + OTP_LOCKOUT_MINUTES * 60 * 1000);
-        temp.otpAttempts = 0;
+      user.otpAttempts = (user.otpAttempts || 0) + 1;
+      if (user.otpAttempts >= MAX_OTP_ATTEMPTS) {
+        user.otpLockedUntil = new Date(Date.now() + OTP_LOCKOUT_MINUTES * 60 * 1000);
+        user.otpAttempts = 0;
       }
-      await temp.save();
+      await user.save();
       return res.status(401).json({ message: 'Invalid OTP' });
     }
 
-    // Success: Create user
-    const decryptedData = JSON.parse(decrypt(temp.encryptedData));
-    const user = new User({
-      Username: decryptedData.username,
-      email,
-      password: decryptedData.password, // pre-hashed password
-    });
+    // success -> clear otp fields
+    user.otpHash = undefined;
+    user.otpExpiry = undefined;
+    user.otpAttempts = 0;
+    user.otpLockedUntil = undefined;
     await user.save();
-    await TempRegistration.deleteOne({ _id: temp._id });
 
+    // tokens
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
+
+    // use refreshToken cookie name consistently
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
-
-    return res.status(201).json(buildAuthResponse(user, accessToken));
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.json(buildAuthResponse(user, accessToken));
+  } catch (err) {
+    return res.status(500).json({ message: err.message || 'Server error' });
   }
 };
 
-// --- LOGIN ---
+
+// LOGIN: step 1 - validate password then send OTP (do NOT issue tokens here)
 exports.loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+    email = normalizeEmail(email);
 
-    // 1. Find user
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'bhai user nahi mil raha ' });
+    if (!user) return res.status(401).json({ message: 'Invalid email or password' });
 
-    // 2. Check password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'bhai password wrong ha ' });
+    if (!isMatch) return res.status(401).json({ message: 'Invalid email or password' });
 
-    // 3. Create tokens
-    const accessToken = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '15m' } // short lived
-    );
+    // Always require email OTP on successful password
+    await sendLoginOtp(user);
 
-    const refreshToken = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: '7d' } // long lived
-    );
-
-    // 4. Store refresh token in cookie
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // only send over HTTPS in prod
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    // 5. Send accessToken to client
-    return res.json({ accessToken });
+    return res.json({ need2fa: true, method: 'email' });
   } catch (err) {
-    console.error('Login error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    const status = err.status || 500;
+    return res.status(status).json({ message: err.message || 'Server error' });
   }
 };
 
