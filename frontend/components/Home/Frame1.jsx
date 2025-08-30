@@ -8,8 +8,7 @@ const Frame1 = () => {
   const navigate = useNavigate();
 
   // Letter animation
-  const letterRefs = useRef(SKILLWAP_LETTERS.map(() => React.createRef()));
-  const [rotations] = useState(() => SKILLWAP_LETTERS.map(() => (Math.random() * 16 - 8).toFixed(1)));
+  const letterRefs = useRef(SKILLWAP_LETTERS.map(() => React.createRef())); 
 
   // --- Modals ---
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -164,7 +163,7 @@ const Frame1 = () => {
   const [rotations] = useState(() => SKILLWAP_LETTERS.map(() => (Math.random() * 16 - 4).toFixed(1)))
 
   return (
-    <div ref={frameRef} className="relative w-full min-h-screen bg-[#f6f4f4] flex flex-col justify-between ">
+    <div className="relative w-full min-h-screen bg-[#f6f4f4] flex flex-col justify-between ">
       <div className="absolute top-8 left-6 select-none flex flex-col items-start z-20">
         <div style={{ display: 'flex', marginBottom: '0.2em', transform: 'rotate(-3deg)' }}>
           {SKILLWAP_LETTERS.map((char, i) => (
@@ -190,7 +189,7 @@ const Frame1 = () => {
 
       <div className="flex flex-1 items-center justify-center">
         <div className="relative flex flex-col items-center">
-          <img className="animated-image" src="/src/public/images/frame1_main.png" alt="" />
+          <img className="animated-image" src="/images/frame1_main.png" alt="" />
           <style>{`
             @keyframes floatAround {
               0%   { transform: translate(0, 0); }
