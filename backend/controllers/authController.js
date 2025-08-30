@@ -93,9 +93,9 @@ exports.requestRegisterOtp = async (req, res) => {
     if (!temp) temp = new TempRegistration({ email });
 
     // Hash password and encrypt data
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const data = JSON.stringify({ username, hashedPassword });
+    // const salt = await bcrypt.genSalt(10);
+    // const hashedPassword = await bcrypt.hash(password, salt);
+    const data = JSON.stringify({ username, password });
     temp.encryptedData = encrypt(data);
 
     // Generate and hash OTP
@@ -154,7 +154,7 @@ exports.verifyRegisterOtp = async (req, res) => {
     const user = new User({
       Username: decryptedData.username,
       email,
-      password: decryptedData.hashedPassword, // pre-hashed password
+      password: decryptedData.password, // pre-hashed password
     });
     await user.save();
     await TempRegistration.deleteOne({ _id: temp._id });
