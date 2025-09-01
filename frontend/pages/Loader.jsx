@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const images = [
-  "images/LoaderImage1.png",
+  "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713341/LoaderImage1_wd8psj.png",
   "images/LoaderImage2.jpg",
-  "images/LoaderImage3.png",
+  "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713342/LoaderImage3_nktpak.png",
   "images/LoaderImage4.png",
-  "images/LoaderImage5.png",
+  "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713342/LoaderImage5_mw0wle.png",
   "images/LoaderImage6.png",
 ];
 
