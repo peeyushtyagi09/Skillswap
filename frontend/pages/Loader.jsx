@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const images = [
   "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713341/LoaderImage1_wd8psj.png",
-  "ihttps://res.cloudinary.com/djlcf4ix9/image/upload/v1756713340/LoaderImage2_kco4px.jpg",
+  "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713340/LoaderImage2_kco4px.jpg",
   "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713342/LoaderImage3_nktpak.png",
   "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713351/LoaderImage4_p3kaay.png",
   "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713342/LoaderImage5_mw0wle.png",
