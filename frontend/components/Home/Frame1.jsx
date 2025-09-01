@@ -174,18 +174,19 @@ const Frame1 = () => {
             <span key={`skillwap-${i}`} ref={letterRefs.current[i]} style={{
               display: 'inline-block',
               transform: `rotate(${rotations[i]}deg)`,
-              fontFamily: '"Luckiest Guy", sans-serif',
+              fontFamily: '"Luckiest Guy", "Comic Sans MS", "Brush Script MT", cursive, sans-serif',
               fontWeight: 1000,
               fontSize: '4.5rem',
               lineHeight: 1,
               color: '#f6f4f4',
               letterSpacing: '0.01em',
-              textShadow: '0 2px 0 #000, 0 4px 0 #000',
+              textShadow: '0 2px 0 #000, 0 4px 0 #000, 0 6px 0 #000, 0 8px 0 #000',
               WebkitTextStroke: '4px #000',
               background: 'transparent',
               padding: 0,
               margin: 0,
               textTransform: 'uppercase',
+              opacity: 1,
             }}>{char}</span>
           ))}
         </div>
@@ -208,8 +209,12 @@ const Frame1 = () => {
       </div>
 
       <div className="absolute bottom-8 right-8 flex gap-4">
-        <button onClick={() => setShowLoginModal(true)} className="px-6 py-3 bg-black text-white rounded-lg font-semibold shadow-lg">Login</button>
-        <button onClick={() => setShowRegisterModal(true)} className="px-6 py-3 bg-white text-black border-2 border-black rounded-lg font-semibold shadow-lg">Register</button>
+        <button onClick={() => setShowLoginModal(true)} className="px-6 py-3 bg-black text-white rounded-lg font-semibold shadow-lg"
+        style={{ fontFamily: 'cursive, "Comic Sans MS", "Brush Script MT", sans-serif', fontWeight: 600, transform: 'rotate(-10deg)', letterSpacing: '0.01em', }}
+        >Login</button>
+        <button onClick={() => setShowRegisterModal(true)} className="px-6 py-3 bg-white text-black border-2 border-black rounded-lg font-semibold shadow-lg"
+          style={{ fontFamily: 'cursive, "Comic Sans MS", "Brush Script MT", sans-serif', fontWeight: 600, transform: 'rotate(-10deg)', letterSpacing: '0.01em', }}
+          >Register</button>
       </div>
 
       {/* Login Modal */}
