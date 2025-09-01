@@ -6,7 +6,7 @@ export function initSocket() {
   const token = localStorage.getItem("accessToken");
 
   if (!socket) {
-    socket = io("http://localhost:8000", {
+    socket = io(import.meta.env.VITE_API_URL, {
       auth: { token },
       reconnection: true,
       reconnectionDelay: 1000,
