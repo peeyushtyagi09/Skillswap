@@ -76,7 +76,7 @@ export default function Frame5() {
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           style={{ transformStyle: "preserve-3d" }}
         >
-          <img src="/images/image3.png" alt="Card" className="w-48 h-64 object-cover" draggable={false} />
+          <img src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714738/Qmbqv4ogPHw74KFXqGcKsjo5ujJp3thmk4MEZueUzQmNWP_lhukal.avif" alt="Card" className="w-48 h-64 object-cover" draggable={false} />
         </motion.div>
 
         {/* Center card triggers both ring radius and side slide */}
@@ -87,7 +87,7 @@ export default function Frame5() {
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-          <img src="/images/image4.png" alt="Card" className="w-56 h-72 object-cover" draggable={false} />
+          <img src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714732/QmPUgiRv7D5FDuS8U1Mp3sh1v4rV3akXrcj5mJfqeFmZMF_eggkr6.avif" alt="Card" className="w-56 h-72 object-cover" draggable={false} />
         </motion.div>
 
         {/* Right card, animated by centerHover */}
@@ -102,7 +102,7 @@ export default function Frame5() {
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
           style={{ transformStyle: "preserve-3d" }}
         >
-          <img src="/images/image5.png" alt="Card" className="w-48 h-64 object-cover" draggable={false} />
+          <img src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714714/QmPYZZ2f8FkyYNRabT3SUycwUhS5jHzev1xzehSFFwFi2g_vbfejd.avif" alt="Card" className="w-48 h-64 object-cover" draggable={false} />
         </motion.div>
       </div>
 

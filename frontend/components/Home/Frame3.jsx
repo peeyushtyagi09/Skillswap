@@ -29,25 +29,25 @@ const Frame3 = () => {
     {
       text: "Swap skills, unlock new opportunities",
       images: [
-        "/images/image1.png",
-        "/images/image2.png",
-        "/images/image3.png",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714449/Qmd1M7FM9mMSxQXMRNfmitBjUZk4AFqBHsjkxrWu1c3xUq_dt3p7l.avif",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714427/QmXR1Jrsk2c6F4HRr9XUtZJL2bxQCoH8iu35dGrWYDbnRv_xzmhgf.avif",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714491/QmZSc8gYXn5zQ8Bu1S9ouaPLqzVkEJBVc5J2a2BkNp31t4_xfco2k.avif",
       ],
     },
     {
       text: "Learn fast through real connections",
       images: [
-        "/images/image4.png",
-        "/images/image5.png",
-        "/images/image1.png",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714433/QmdA82UVcuJa2qYosG7q423ss7WUdLtQDkgy9DGTtg5GL1_rmkuni.avif",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756714334/QmQfMXMq8EsPTbUiLKCHxuhSPKTzpdVMSYL5w9gNj9cAVF_hxumuf.avif",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713347/image2_o2aiai.png",
       ],
     },
     {
       text: "Grow together, teach and inspire",
       images: [
-        "/images/image1.png",
-        "/images/image3.png",
-        "/images/image5.png",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713339/image3_wnsfus.png",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713338/image1_jfxrle.png",
+        "https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713339/image5_sw43cl.png",
       ],
     },
   ];

@@ -193,7 +193,7 @@ const Frame1 = () => {
 
       <div className="flex flex-1 items-center justify-center">
         <div className="relative flex flex-col items-center">
-          <img className="animated-image" src="/images/frame1_main.png" alt="" />
+          <img className="animated-image" src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713340/frame1_main_ltbaw9.png" alt="" />
           <style>{`
             @keyframes floatAround {
               0%   { transform: translate(0, 0); }
