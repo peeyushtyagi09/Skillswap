@@ -167,7 +167,7 @@ const Frame1 = () => {
   const [rotations] = useState(() => SKILLWAP_LETTERS.map(() => (Math.random() * 16 - 4).toFixed(1)))
 
   return (
-    <div className="relative w-full min-h-screen bg-yellow-400 flex flex-col justify-between ">
+    <div className="relative w-full min-h-screen bg-green-400 flex flex-col justify-between ">
       <div className="absolute top-8 left-6 select-none flex flex-col items-start z-20">
         <div style={{ display: 'flex', marginBottom: '0.2em', transform: 'rotate(-3deg)' }}>
           {SKILLWAP_LETTERS.map((char, i) => (
