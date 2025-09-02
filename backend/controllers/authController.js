@@ -130,13 +130,12 @@ exports.verifyRegisterOtp = async (req, res) => {
       return res.status(401).json({ message: "Invalid OTP" });
     }
 
-    const decrypted = JSON.parse(decrypt(temp.encryptedData));
-    const hashedPassword = await hashString(decrypted.password);
+    const decrypted = JSON.parse(decrypt(temp.encryptedData)); 
 
     const user = new User({
       Username: decrypted.username,
       email,
-      password: hashedPassword,
+      password: decrypted.password,
     });
     await user.save();
     await temp.deleteOne();

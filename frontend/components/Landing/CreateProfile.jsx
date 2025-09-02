@@ -11,7 +11,8 @@ const CreateProfile = () => {
     bio: '',
     skillsHave: '',
     skillsWant: '',
-    profilePic: ''
+    profilePic: '',
+    certificate: '',
   });
   const [loading, setLoading] = useState(false);
   const [uploadingPic, setUploadingPic] = useState(false);
@@ -61,15 +62,15 @@ const CreateProfile = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
+      
+      console.log('Cloudinary upload response:', data);
 
-      console.log('Upload response:', data);
-
-      // Save to profile immediately so it's available when viewing profile
+      // Save Cloudinary URL to profile
       const saveResponse = await api.put('/profile/profile-picture', { profilePic: data.imageUrl }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      console.log('Save response:', saveResponse.data);
+      console.log('Profile updated with Cloudinary URL:', saveResponse.data);
 
       setFormData(prev => ({ ...prev, profilePic: data.imageUrl }));
       console.log('Profile picture uploaded and saved:', data.imageUrl);
@@ -79,6 +80,34 @@ const CreateProfile = () => {
       setUploadingPic(false);
     }
   };
+
+  const handleUploadCertificate = async (file) => {
+    if (!file) return
+
+    try{
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        alert('Not authenticated');
+        return;
+      }
+
+      const formDataData = new FormData();
+      formDataData.append('certificate', file);
+
+      const { data } = await api.post('/api/upload/certificate', formDataData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log('Certificate uploaded successfully:', data);
+
+      setFormData(prev => ({ ...prev, certificate: data.fileUrl }));
+    }catch (error) {
+      alert(error?.response?.data?.message || 'Failed to upload certificate');
+    }
+  } 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,7 +127,8 @@ const CreateProfile = () => {
         bio: formData.bio,
         skillsHave: formData.skillsHave ? formData.skillsHave.split(',').map(s => s.trim()) : [],
         skillsWant: formData.skillsWant ? formData.skillsWant.split(',').map(s => s.trim()) : [],
-        profilePic: formData.profilePic || '' // Include the profile picture URL
+        profilePic: formData.profilePic || '', // Include the profile picture URL
+        certificate: formData.certificate || ''
       };
 
       console.log('Creating profile with data:', profileData);
@@ -270,6 +300,28 @@ const CreateProfile = () => {
               placeholder="e.g., Python, Machine Learning, UI/UX (separate with commas)"
             />
           </div>
+          {/* Certificate Upload Section */}
+            <div className="text-center mt-8">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Certificate (PDF, Word, or Image)
+              </label>
+
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,image/*"
+                onChange={(e) => handleUploadCertificate(e.target.files[0])}
+                className="file-input file-input-bordered w-full max-w-xs"
+              />
+
+              {formData.certificate && (
+                <div className="mt-3 p-2 bg-green-50 rounded-lg">
+                  <p className="text-sm text-green-700">
+                    ✓ Certificate uploaded successfully!
+                  </p>
+                </div>
+              )}
+            </div>
+
 
           <div className="flex gap-4 pt-4">
             <button
