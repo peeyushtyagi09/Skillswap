@@ -85,8 +85,8 @@ app.get('/', (req, res) => {
 
 app.use('/api', apiLimiter);
 
-// Static files (uploads)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// // Static files (uploads)
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Healthcheck
 app.get('/health', (req, res) => {
