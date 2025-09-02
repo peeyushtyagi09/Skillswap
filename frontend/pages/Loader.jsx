@@ -45,7 +45,7 @@ export default function Loader({ onFinish }) {
   }, [onFinish]);
 
   return (
-    <div className="w-screen h-screen flex flex-col md:flex-row items-center justify-center gap-10 bg-gray-50 overflow-hidden">
+    <div className=" bg-green-400 w-screen h-screen flex flex-col md:flex-row items-center justify-center gap-10 bg-gray-50 overflow-hidden">
       
       {/* Left: Progress */}
       <div className="flex flex-col items-start">
