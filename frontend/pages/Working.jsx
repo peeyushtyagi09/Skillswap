@@ -2,7 +2,7 @@ import React, {useState} from "react";
 
 import { useNavigate} from 'react-router-dom';
 import Dock from '../src/block/Dock/Dock';  
-import Loader2 from "../components/Loaders/Loader2"
+import Loader3 from "../components/Loaders/Loader3"
 
 
 const Working = () => {
@@ -21,12 +21,12 @@ const Working = () => {
     setLoading(false);
   };
 
-  if (loading) return <Loader2 />;
+  if (loading) return <Loader3 />;
   return (
     <div className="relative w-full h-screen">
       {/* Full width image from public folder */}
       <img
-        src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713344/working_fv6dia.pn" // put your image inside /public
+        src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713344/working_fv6dia.png" // put your image inside /public
         alt="Coming soon yes we are working "
         className="w-full h-full object-cover"
         onLoad={handleImageLoad}

@@ -4,7 +4,7 @@ import api from '../src/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Dock from '../src/block/Dock/Dock';
-import Loader2 from "../components/Loaders/Loader2"
+import Loader3 from "../components/Loaders/Loader3"
 
 // Remove unused import
 // import gsap from 'gsap';
@@ -293,7 +293,7 @@ const Landing = () => {
 
   if (loading) {
     return (
-     <Loader2 />
+     <Loader3 />
     );
   }
 

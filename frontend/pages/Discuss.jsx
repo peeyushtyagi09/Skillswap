@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../src/api';
 import Dock from '../src/block/Dock/Dock'; 
-import Loader2 from "../components/Loaders/Loader2"
+import Loader3 from "../components/Loaders/Loader3"
 
 // Use window.ENV or fallback for API base
 const API_BASE =
@@ -592,7 +592,7 @@ const Discuss = () => {
 
   // Render
   if (loading) return (
-   <Loader2 />
+   <Loader3 />
   );
   if (error) return <div className="text-red-600 text-center py-8">{error}</div>;
 
