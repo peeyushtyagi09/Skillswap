@@ -24,7 +24,7 @@ const App = () => {
   const location = useLocation();
 
   // routes where Loader1 should NOT appear
-  const noLoaderRoutes = ["/call", "/create-profile", "/update-profile", "/chat"];
+  const noLoaderRoutes = ["/call", "/create-profile", "/update-profile", "/chat", "/"];
 
   const shouldUseLoader1 = !noLoaderRoutes.includes(location.pathname);
 
