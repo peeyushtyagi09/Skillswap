@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../src/api';
 import Dock from '../src/block/Dock/Dock'; 
+import Loader2 from "../components/Loaders/Loader2"
 
 // Use window.ENV or fallback for API base
 const API_BASE =
@@ -591,12 +592,7 @@ const Discuss = () => {
 
   // Render
   if (loading) return (
-    <div className="min-h-[60vh] flex items-center justify-center bg-[#f6f4f4]">
-      <div className="flex flex-col items-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600 mb-2"></div>
-        <span className="text-gray-600 font-semibold">Loading discussions...</span>
-      </div>
-    </div>
+   <Loader2 />
   );
   if (error) return <div className="text-red-600 text-center py-8">{error}</div>;
 

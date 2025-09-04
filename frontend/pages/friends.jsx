@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../src/api';
 import Dock from '../src/block/Dock/Dock'; 
+import Loader2 from "../components/Loaders/Loader2"
 
 const Friends = () => {
   const navigate = useNavigate();
@@ -140,10 +141,7 @@ const Friends = () => {
   }, []);
 
   if (loading) return (
-    <div className="flex justify-center items-center h-40">
-      <span className="loading loading-spinner loading-lg text-primary"></span>
-      <span className="ml-4 text-lg">Loading friends...</span>
-    </div>
+    <Loader2 />
   );
   if (error) return (
     <div className="alert alert-error shadow-lg my-4">
@@ -154,7 +152,7 @@ const Friends = () => {
   return (
     <div  className="w-full h-screen overflow-hidden "
     style={{
-      backgroundImage: "url('/images/friend.png')", // put your file in /public/images
+      backgroundImage: "url('https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713343/friend_vgp7xs.png')", // put your file in /public/images
       backgroundRepeat: "repeat-y", // repeat vertically if height increases
       backgroundSize: "100% auto", // stretch full width, keep ratio
     }}

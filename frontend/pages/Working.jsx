@@ -1,11 +1,14 @@
 import React from "react";
 
 import { useNavigate} from 'react-router-dom';
-import Dock from '../src/block/Dock/Dock'; 
+import Dock from '../src/block/Dock/Dock';  
+import Loader2 from "../components/Loaders/Loader2"
+
 
 const Working = () => {
     
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
     const items = [
         { label: "Home", icon: ' 🏠 ', onClick: () => navigate("/landing") },
@@ -13,13 +16,20 @@ const Working = () => {
         { label: "Friends", icon: '👨', onClick: () => navigate("/friends") },
         {label: "Primium", icon: '🏆', onClick:() => navigate("/Working")}
       ];
+      // when image finishes loading -> hide loader
+  const handleImageLoad = () => {
+    setLoading(false);
+  };
+
+  if (loading) return <Loader2 />;
   return (
     <div className="relative w-full h-screen">
       {/* Full width image from public folder */}
       <img
-        src="/images/working.png" // put your image inside /public
+        src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713344/working_fv6dia.png" // put your image inside /public
         alt="Coming soon"
         className="w-full h-full object-cover"
+        onLoad={handleImageLoad}
       />
 
       {/* Text overlay */}

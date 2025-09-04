@@ -2,6 +2,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ChatWindow from '../components/Chat/ChatWindow';
 import useFriendshipGuard from '../hooks/useFriendshipGuard';
+import Loader2 from "../components/Loaders/Loader2"
 
 export default function ChatPage() {
   const [params] = useSearchParams();
@@ -10,12 +11,7 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="mt-4 text-gray-600">Verifying friendship...</p>
-        </div>
-      </div>
+      <Loader2/>
     );
   }
 

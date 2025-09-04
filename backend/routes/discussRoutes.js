@@ -11,6 +11,7 @@ const {
   viewDiscussion
 } = require("../controllers/DiscussControllers");
 const { protect } = require("../middleware/authMiddleware");
+const { } = require('../upload/upload')
 
 const router = express.Router();
 

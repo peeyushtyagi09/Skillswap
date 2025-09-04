@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../src/api';
+import Dock from '../src/block/Dock/Dock'; 
+import Loader2 from "../components/Loaders/Loader2"
+
 
 // ViewProfile Page
 // - Displays the same profile UI previously shown in a modal, now as a full page
@@ -64,10 +67,7 @@ export default function ViewProfile() {
         >
           {/* States */}
           {loading && (
-            <div className="w-full flex flex-col items-center justify-center py-24">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary border-solid mb-4" />
-              <span className="text-lg text-gray-700 font-medium">Loading profile...</span>
-            </div>
+           <Loader2 />
           )}
 
           {!loading && error && (
