@@ -20,16 +20,20 @@ const Working = () => {
   const handleImageLoad = () => {
     setLoading(false);
   };
+  const handleImageError = () => {
+    setLoading(false); // stop loader even if image fails
+  };
 
   if (loading) return <Loader2 />;
   return (
     <div className="relative w-full h-screen">
       {/* Full width image from public folder */}
       <img
-        src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713343/friend_vgp7xs.png" // put your image inside /public
-        alt="Coming soon yes we are working "
+        src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713344/working_fv6dia.png" // put your image inside /public
+        alt="Coming soon"
         className="w-full h-full object-cover"
         onLoad={handleImageLoad}
+        onError={handleImageError}
       />
 
       {/* Text overlay */}
