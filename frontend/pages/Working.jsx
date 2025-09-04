@@ -2,7 +2,7 @@ import React, {useState} from "react";
 
 import { useNavigate} from 'react-router-dom';
 import Dock from '../src/block/Dock/Dock';  
-import Loader3 from "../components/Loaders/Loader3"
+import Loader2 from "../components/Loaders/Loader2"
 
 
 const Working = () => {
@@ -21,7 +21,7 @@ const Working = () => {
     setLoading(false);
   };
 
-  if (loading) return <Loader3 />;
+  if (loading) return <Loader2 />;
   return (
     <div className="relative w-full h-screen">
       {/* Full width image from public folder */}

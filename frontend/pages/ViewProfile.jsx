@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../src/api';
 import Dock from '../src/block/Dock/Dock'; 
-import Loader3 from "../components/Loaders/Loader3"
+import Loader2 from "../components/Loaders/Loader2"
 
 
 // ViewProfile Page
@@ -67,7 +67,7 @@ export default function ViewProfile() {
         >
           {/* States */}
           {loading && (
-           <Loader3 />
+           <Loader2 />
           )}
 
           {!loading && error && (

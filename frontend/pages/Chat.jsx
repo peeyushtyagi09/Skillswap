@@ -2,7 +2,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ChatWindow from '../components/Chat/ChatWindow';
 import useFriendshipGuard from '../hooks/useFriendshipGuard';
-import Loader3 from "../components/Loaders/Loader3"
+import Loader2 from "../components/Loaders/Loader2"
 
 export default function ChatPage() {
   const [params] = useSearchParams();
@@ -11,7 +11,7 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <Loader3/>
+      <Loader2/>
     );
   }
 

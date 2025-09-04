@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../src/api';
 import Dock from '../src/block/Dock/Dock'; 
-import Loader3 from "../components/Loaders/Loader3"
+import Loader2 from "../components/Loaders/Loader2"
 
 const Friends = () => {
   const navigate = useNavigate();
@@ -141,7 +141,7 @@ const Friends = () => {
   }, []);
 
   if (loading) return (
-    <Loader3 />
+    <Loader2 />
   );
   if (error) return (
     <div className="alert alert-error shadow-lg my-4">
