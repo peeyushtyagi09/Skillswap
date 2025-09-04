@@ -44,11 +44,11 @@ const loader2 = () => {
       </div>
       <div className='h-[20%] w-full  justify-end  items-end flex'> 
          <div useRef={smallStair} className='h-12 w-24 m-10 mr-15 flex overflow-hidden'>
-            <div className=' stair-2 h-full w-1/5 bg-black'></div>
-            <div className=' stair-2 h-full w-1/5 bg-black'></div>
-            <div className=' stair-2 h-full w-1/5 bg-black'></div>
-            <div className=' stair-2 h-full w-1/5 bg-black'></div>
-            <div className=' stair-2 h-full w-1/5 bg-black'></div>
+            <div className=' stair-2 h-full w-1/5 bg-white'></div>
+            <div className=' stair-2 h-full w-1/5 bg-white'></div>
+            <div className=' stair-2 h-full w-1/5 bg-white'></div>
+            <div className=' stair-2 h-full w-1/5 bg-white'></div>
+            <div className=' stair-2 h-full w-1/5 bg-white'></div>
          </div>
       </div>
     </div>
