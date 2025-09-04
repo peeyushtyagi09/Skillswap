@@ -22,7 +22,7 @@ const loader2 = () => {
           );
       });
   return (
-    <div  className='h-screen w-screen overflow-hidden bg-black text-white flex flex-col justify-between'>
+  <div  className='h-screen w-screen overflow-hidden bg-[#f6f4f4] text-black flex flex-col justify-between'>
       <div className='h-[20%] w-full  m-10'>
         <h1 style={{
               display: 'inline-block',
