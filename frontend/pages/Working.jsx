@@ -15,7 +15,7 @@ const Working = () => {
   ];
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full h-screen overflow-hidden">
       {/* Image must always render so onLoad can fire */}
       <img
         src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713344/working_fv6dia.png"
