@@ -12,12 +12,22 @@ const CreateProfile = () => {
     skillsHave: '',
     skillsWant: '',
     profilePic: '',
-    certificate: '',
   });
   const [loading, setLoading] = useState(false);
   const [uploadingPic, setUploadingPic] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
+
+  // Certificates (collect locally before creating profile)
+  const [certificates, setCertificates] = useState([]);
+  const [uploadingCert, setUploadingCert] = useState(false);
+  const [certForm, setCertForm] = useState({
+    name: '',
+    issuer: '',
+    date: '',
+    file: null,
+    url: ''
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,33 +83,66 @@ const handleUploadProfilePic = async (file = selectedFile) => {
   }
 };
 
-  const handleUploadCertificate = async (file) => {
-    if (!file) return
+  // Certificate helpers
+  const handleCertChange = (e) => {
+    const { name, value } = e.target;
+    setCertForm(prev => ({ ...prev, [name]: value }));
+  };
 
-    try{
+  const handleCertFileSelect = (e) => {
+    const file = e.target.files[0] || null;
+    setCertForm(prev => ({ ...prev, file }));
+  };
+
+  const addCertificate = async () => {
+    if (!certForm.name || !certForm.issuer) {
+      alert('Please provide certificate name and issuer');
+      return;
+    }
+
+    setUploadingCert(true);
+    try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
         alert('Not authenticated');
         return;
       }
 
-      const formDataData = new FormData();
-      formDataData.append('certificate', file);
+      let fileUrl = '';
+      if (certForm.file) {
+        const fd = new FormData();
+        fd.append('certificate', certForm.file);
+        const up = await api.post('/upload/certificate', fd, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        fileUrl = up.data.fileUrl;
+      }
 
-      const { data } = await api.post('/api/upload/certificate', formDataData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      // Prepare local certificate entry
+      const entry = {
+        name: certForm.name,
+        issuer: certForm.issuer,
+        date: certForm.date || undefined,
+        fileUrl: fileUrl || undefined,
+        url: !fileUrl && certForm.url ? certForm.url : undefined,
+      };
 
-      console.log('Certificate uploaded successfully:', data);
-
-      setFormData(prev => ({ ...prev, certificate: data.fileUrl }));
-    }catch (error) {
-      alert(error?.response?.data?.message || 'Failed to upload certificate');
+      setCertificates(prev => [...prev, entry]);
+      setCertForm({ name: '', issuer: '', date: '', file: null, url: '' });
+      alert('Certificate added!');
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to add certificate');
+    } finally {
+      setUploadingCert(false);
     }
-  } 
+  };
+
+  const removeCertificate = (index) => {
+    setCertificates(prev => prev.filter((_, i) => i !== index));
+  }; 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -119,8 +162,8 @@ const handleUploadProfilePic = async (file = selectedFile) => {
         bio: formData.bio,
         skillsHave: formData.skillsHave ? formData.skillsHave.split(',').map(s => s.trim()) : [],
         skillsWant: formData.skillsWant ? formData.skillsWant.split(',').map(s => s.trim()) : [],
-        profilePic: formData.profilePic || '', // Include the profile picture URL
-        certificate: formData.certificate || ''
+        profilePic: formData.profilePic || '',
+        certificates: certificates,
       };
 
       console.log('Creating profile with data:', profileData);
@@ -292,27 +335,102 @@ const handleUploadProfilePic = async (file = selectedFile) => {
               placeholder="e.g., Python, Machine Learning, UI/UX (separate with commas)"
             />
           </div>
-          {/* Certificate Upload Section */}
-            <div className="text-center mt-8">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Certificate (PDF, Word, or Image)
-              </label>
+          {/* Certificates section (collect locally, submit with profile) */}
+          <div className="mt-8">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Certificates
+            </label>
 
+            {/* Existing (local) certificates */}
+            {certificates.length > 0 ? (
+              <div className="space-y-3 mb-4">
+                {certificates.map((cert, idx) => {
+                  const link = cert.fileUrl || cert.url || '';
+                  const isImage = link && /\.(jpg|jpeg|png|gif|webp)$/i.test(link);
+                  return (
+                    <div key={idx} className="p-3 border rounded-lg flex items-start gap-3">
+                      <div className="flex-1">
+                        <p className="font-medium">{cert.name}</p>
+                        <p className="text-sm text-gray-600">Issuer: {cert.issuer}</p>
+                        {cert.date && (
+                          <p className="text-sm text-gray-600">Date: {new Date(cert.date).toLocaleDateString()}</p>
+                        )}
+                        {link && (
+                          isImage ? (
+                            <a href={link} target="_blank" rel="noopener noreferrer" className="block mt-2">
+                              <img src={link} alt={cert.name} className="rounded shadow max-h-24 border border-gray-200" style={{ maxWidth: '160px', objectFit: 'contain' }} />
+                            </a>
+                          ) : (
+                            <a href={link} target="_blank" rel="noopener noreferrer" className="link link-primary mt-1 inline-block">
+                              View file
+                            </a>
+                          )
+                        )}
+                      </div>
+                      <button type="button" className="btn btn-error btn-sm" onClick={() => removeCertificate(idx)}>
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600 mb-2">No certificates added yet.</p>
+            )}
+
+            {/* Add new certificate */}
+            <div className="border rounded-lg p-3 space-y-3">
+              <input
+                type="text"
+                name="name"
+                value={certForm.name}
+                onChange={handleCertChange}
+                placeholder="Certificate name"
+                className="input input-bordered w-full"
+              />
+              <input
+                type="text"
+                name="issuer"
+                value={certForm.issuer}
+                onChange={handleCertChange}
+                placeholder="Issuer"
+                className="input input-bordered w-full"
+              />
+              <input
+                type="date"
+                name="date"
+                value={certForm.date}
+                onChange={handleCertChange}
+                className="input input-bordered w-full"
+              />
               <input
                 type="file"
                 accept=".pdf,.doc,.docx,image/*"
-                onChange={(e) => handleUploadCertificate(e.target.files[0])}
-                className="file-input file-input-bordered w-full max-w-xs"
+                onChange={handleCertFileSelect}
+                className="file-input file-input-bordered w-full"
               />
-
-              {formData.certificate && (
-                <div className="mt-3 p-2 bg-green-50 rounded-lg">
-                  <p className="text-sm text-green-700">
-                    ✓ Certificate uploaded successfully!
-                  </p>
-                </div>
-              )}
+              <input
+                type="url"
+                name="url"
+                value={certForm.url}
+                onChange={handleCertChange}
+                placeholder="Or paste a public file URL"
+                className="input input-bordered w-full"
+              />
+              <div className="text-right">
+                <button type="button" onClick={addCertificate} disabled={uploadingCert} className="btn btn-primary btn-sm">
+                  {uploadingCert ? (
+                    <>
+                      <span className="loading loading-spinner loading-sm"></span>
+                      Saving...
+                    </>
+                  ) : (
+                    'Add Certificate'
+                  )}
+                </button>
+              </div>
             </div>
+          </div>
 
 
           <div className="flex gap-4 pt-4">
