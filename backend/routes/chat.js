@@ -5,7 +5,30 @@ const { protect } = require('../middleware/authMiddleware');
 const { validateBody, Joi } = require('../middleware/validate');
 const { areFriends } = require('../services/friendship');
 const ChatClear = require('../models/ChatClear');
-const upload = require("../upload/multer") 
+const multer = require('multer');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// Ensure Cloudinary is configured (upload/upload.js also configures when mounted)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const chatMediaStorage = new CloudinaryStorage({
+  cloudinary,
+  params: (req, file) => {
+    const isImage = (file.mimetype || '').startsWith('image/');
+    return {
+      folder: 'chat_media',
+      resource_type: 'auto', // allow images, videos, and other files
+      transformation: isImage ? [{ quality: 'auto', fetch_format: 'auto' }] : undefined,
+    };
+  },
+});
+
+const uploadChatCloud = multer({ storage: chatMediaStorage }); 
 
 
 // Small helper to safely escape regex
@@ -108,7 +131,7 @@ router.get('/search', protect, async function(req, res) {
 });
 
 // Send media message
-router.post("/sendMedia", protect, upload.single("file"), async (req, res) => {
+router.post("/sendMedia", protect, uploadChatCloud.single("file"), async (req, res) => {
   try {
     const { receiverId } = req.body;
     if (!receiverId) return res.status(400).json({ message: 'receiverId is required' });
@@ -125,7 +148,7 @@ router.post("/sendMedia", protect, upload.single("file"), async (req, res) => {
       receiverId,
       type,
       attachment: {
-        url: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`,
+        url: req.file.path,
         name: req.file.originalname,
         mimeType: req.file.mimetype,
         size: req.file.size,

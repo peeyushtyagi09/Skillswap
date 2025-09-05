@@ -29,7 +29,7 @@ const loader2 = () => {
       const [rotations] = useState(() => SKILLWAP_LETTERS.map(() => (Math.random() * 16 - 4).toFixed(1)))
   return (
   <div  className='h-screen w-screen overflow-hidden bg-[#f6f4f4] text-black flex flex-col justify-between'>
-      <div className='h-[20%] w-full  m-10'>
+      <div className='h-[20%] w-full  ml-10 mt-5'>
       <div style={{ display: 'flex', marginBottom: '0.2em', transform: 'rotate(-3deg)' }}>
           {SKILLWAP_LETTERS.map((char, i) => (
             <span key={`skillwap-${i}`} ref={letterRefs.current[i]} style={{
