@@ -19,8 +19,8 @@ cloudinary.config({
 const cloudinaryImagesStorage = new CloudinaryStorage({
 	cloudinary,
 	params: {
-		floder: 'profile_pictures', // Floder inside Cloudinary
-		allowed_formates: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+		folder: 'profile_pictures', // Folder inside Cloudinary
+		allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
 		transformation: [{ quality: 'auto', fetch_format: 'auto'}],
 	},
 });
@@ -30,7 +30,7 @@ const cloudinaryDocStorage = new CloudinaryStorage({
 	cloudinary,
 	params: {
 		folder: 'certificates',
-		allowed_formates: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+		allowed_formats: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
 	},
 });
 
@@ -54,6 +54,21 @@ router.post('/profile-picture', uploadImageCloud.single('profilePicture'), (req,
 		imageUrl: req.file.path,
 		publicId: req.file.filename,
 		message: 'Profile picture uploaded successfully (cloud)'
+	});
+});
+
+/**
+ * POST /api/upload/image
+ * Generic image upload for features like Discussions
+ */
+router.post('/image', uploadImageCloud.single('image'), (req, res) => {
+	if (!req.file) {
+		return res.status(400).json({ message: 'No file uploaded' });
+	}
+	res.status(200).json({
+		imageUrl: req.file.path,
+		publicId: req.file.filename,
+		message: 'Image uploaded successfully (cloud)'
 	});
 });
 
