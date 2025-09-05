@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../src/api';
+import Loader2 from '../../components/Loaders/Loader2';
 
 const UpdateProfile = () => {
   const navigate = useNavigate();
@@ -235,14 +236,7 @@ const UpdateProfile = () => {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-2xl">
-          <div className="flex items-center justify-center">
-            <div className="loading loading-spinner loading-lg"></div>
-            <span className="ml-3">Loading profile...</span>
-          </div>
-        </div>
-      </div>
+      <Loader2 />
     );
   }
 

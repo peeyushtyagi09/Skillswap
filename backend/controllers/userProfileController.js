@@ -102,10 +102,6 @@ exports.updateProfile = async (req, res) => {
 exports.updateProfilePicture = async (req, res) => {
     try {
         const { profilePic } = req.body;
-        
-        console.log('Updating profile picture for email:', req.user.email.toLowerCase());
-        console.log('Profile picture URL:', profilePic);
-        
         if (!profilePic) {
             return res.status(400).json({ message: "Profile picture URL is required" });
         }
@@ -116,19 +112,14 @@ exports.updateProfilePicture = async (req, res) => {
             { new: true, runValidators: true }
         );
 
-        if (!profile) {
-            console.log('Profile not found for email:', req.user.email.toLowerCase());
+        if (!profile) { 
             return res.status(404).json({ message: "Profile not found" });
-        }
-
-        console.log('Profile picture updated successfully:', profile.profilePic);
-        console.log('Full profile after update:', profile);
+        } 
         res.json({ 
             message: "Profile picture updated successfully",
             profile 
         });
-    } catch (error) {
-        console.error('Error updating profile picture:', error);
+    } catch (error) { 
         res.status(500).json({ message: error.message });
     }
 };
@@ -198,12 +189,7 @@ exports.getProfile = async (req, res) => {
         const profile = await UserProfile.findOne({ email: req.user.email.toLowerCase() });
         if (!profile) {
             return res.status(404).json({ message: "Profile not found" });
-        }
-        
-        // Debug: Log the profile data
-        console.log('Profile being returned:', profile);
-        console.log('Profile picture in getProfile:', profile.profilePic);
-        
+        } 
         res.json(profile);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -231,13 +217,10 @@ exports.getProfileByUserId = async (req, res) => {
 // Test endpoint to manually set profile picture (for debugging)
 exports.testUpdateProfilePicture = async (req, res) => {
     try {
-        const { profilePic } = req.body;
-        console.log('Test update - Email:', req.user.email.toLowerCase());
-        console.log('Test update - Profile picture URL:', profilePic);
+        const { profilePic } = req.body; 
         
         // First, let's find the profile to see what we're working with
         const existingProfile = await UserProfile.findOne({ email: req.user.email.toLowerCase() });
-        console.log('Existing profile before update:', existingProfile);
         
         const profile = await UserProfile.findOneAndUpdate(
             { email: req.user.email.toLowerCase() },
@@ -245,18 +228,12 @@ exports.testUpdateProfilePicture = async (req, res) => {
             { new: true, runValidators: true }
         );
 
-        if (!profile) {
-            console.log('Profile not found for test update');
+        if (!profile) { 
             return res.status(404).json({ message: "Profile not found" });
-        }
-
-        console.log('Test update successful - Profile picture:', profile.profilePic);
-        console.log('Full profile after update:', profile);
+        } 
         
         // Let's also verify by fetching the profile again
         const verifyProfile = await UserProfile.findOne({ email: req.user.email.toLowerCase() });
-        console.log('Verification - Profile picture after update:', verifyProfile?.profilePic);
-        
         res.json({ 
             message: "Test profile picture update successful",
             profile,
@@ -272,29 +249,45 @@ exports.testUpdateProfilePicture = async (req, res) => {
 exports.testUpdateProfilePictureById = async (req, res) => {
     try {
         const { profilePic } = req.body;
-        const { profileId } = req.params;
-        
-        console.log('Test update by ID - Profile ID:', profileId);
-        console.log('Test update by ID - Profile picture URL:', profilePic);
-        
+        const { profileId } = req.params; 
         const profile = await UserProfile.findByIdAndUpdate(
             profileId,
             { profilePic },
             { new: true, runValidators: true }
         );
 
-        if (!profile) {
-            console.log('Profile not found for test update by ID');
+        if (!profile) { 
             return res.status(404).json({ message: "Profile not found" });
         }
 
-        console.log('Test update by ID successful - Profile picture:', profile.profilePic);
+        // console.log('Test update by ID successful - Profile picture:', profile.profilePic);
         res.json({ 
             message: "Test profile picture update by ID successful",
             profile 
         });
     } catch (error) {
         console.error('Test update by ID error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+// Upload profile picture for initial profile creation
+exports.uploadInitialProfilePicture = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
+        // Cloudinary (or multer-storage-cloudinary) puts the URL in req.file.path
+        const imageUrl = req.file.path;
+
+        res.status(200).json({
+            imageUrl,
+            message: "Initial profile picture uploaded successfully"
+        });
+    } catch (error) {
+        console.error("Error uploading initial profile picture:", error);
         res.status(500).json({ message: error.message });
     }
 };

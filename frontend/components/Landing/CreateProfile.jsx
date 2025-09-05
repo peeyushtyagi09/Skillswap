@@ -40,46 +40,38 @@ const CreateProfile = () => {
     }
   };
 
-  const handleUploadProfilePic = async (file = selectedFile) => {
-    if (!file) {
+// Upload image for initial profile creation
+const handleUploadProfilePic = async (file = selectedFile) => {
+  if (!file) return;
+
+  setUploadingPic(true);
+  try {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("Not authenticated");
       return;
     }
 
-    setUploadingPic(true);
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        alert('Not authenticated');
-        return;
-      }
+    const fd = new FormData();
+    fd.append("profilePicture", file);
 
-      const formData = new FormData();
-      formData.append('profilePicture', file);
+    // 👇 Use the new route instead of /upload/profile-picture
+    const { data } = await api.post("/profile/upload-initial-pic", fd, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-      const { data } = await api.post('/upload/profile-picture', formData, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      console.log('Cloudinary upload response:', data);
-
-      // Save Cloudinary URL to profile
-      const saveResponse = await api.put('/profile/profile-picture', { profilePic: data.imageUrl }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      console.log('Profile updated with Cloudinary URL:', saveResponse.data);
-
-      setFormData(prev => ({ ...prev, profilePic: data.imageUrl }));
-      console.log('Profile picture uploaded and saved:', data.imageUrl);
-    } catch (error) {
-      alert(error?.response?.data?.message || 'Failed to upload profile picture');
-    } finally {
-      setUploadingPic(false);
-    }
-  };
+    // Save the Cloudinary URL to local state only
+    setFormData((prev) => ({ ...prev, profilePic: data.imageUrl }));
+    console.log("Initial profile picture uploaded:", data.imageUrl);
+  } catch (error) {
+    alert(error?.response?.data?.message || "Failed to upload profile picture");
+  } finally {
+    setUploadingPic(false);
+  }
+};
 
   const handleUploadCertificate = async (file) => {
     if (!file) return

@@ -11,8 +11,23 @@ const {
     getProfile,
     getProfileByUserId,
     testUpdateProfilePicture,
-    testUpdateProfilePictureById
+    testUpdateProfilePictureById,
+    uploadInitialProfilePicture
 } = require('../controllers/userProfileController');
+const multer = require('multer');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// Configure cloudinary storage for initial pic
+const initialStorage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: 'profile_pictures',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    },
+});
+const uploadInitial = multer({ storage: initialStorage });
 
 // All routes require authentication
 router.use(protect);
@@ -46,5 +61,13 @@ router.put('/test-profile-picture', testUpdateProfilePicture);
 
 // Test endpoint for profile picture update by ID
 router.put('/test-profile-picture/:profileId', testUpdateProfilePictureById);
+
+// Upload profile picture before creating profile
+router.post(
+    '/upload-initial-pic',
+    uploadInitial.single('profilePicture'),
+    uploadInitialProfilePicture
+);
+
 
 module.exports = router;
