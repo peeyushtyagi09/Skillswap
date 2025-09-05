@@ -19,7 +19,7 @@ const Working = () => {
       {/* Image must always render so onLoad can fire */}
       <img
         src="https://res.cloudinary.com/djlcf4ix9/image/upload/v1756713344/working_fv6dia.png"
-        alt="Coming soon yes we are working on it"
+        alt="Coming soon"
         className="w-full h-full object-cover"
         onLoad={() => setLoading(false)}
         onError={() => setLoading(false)}
